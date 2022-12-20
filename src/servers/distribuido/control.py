@@ -1,6 +1,7 @@
 import RPi.GPIO as GPIO
 import adafruit_dht
 import time
+import json
 import board
 import threading
 
@@ -129,5 +130,9 @@ def states(config):
       else:
         msg['SPor'] = 'OFF'
     
-  except KeyboardInterrupt:
+ # Armazenando dados em um json de estados
+      with open('../../configs/responses.json', 'w') as outfile:
+        json.dump(msg,outfile)
+  except KeyboardInterrupt: # if ctrl + c is pressed, exit cleanly
     pass
+
