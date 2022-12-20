@@ -1,8 +1,8 @@
 {
-    "ip_servidor_central": "164.41.98.28",
-    "porta_servidor_central": 10161,
+    "ip_servidor_central": "164.41.98.26",
+    "porta_servidor_central": 10191,
     "ip_servidor_distribuido": "164.41.98.16",
-    "porta_servidor_distribuido": 10162,
+    "porta_servidor_distribuido": 10192,
     "nome": "Sala 01",
     "outputs": [
         {
@@ -70,4 +70,5 @@
           "gpio": 4
         }
     ]
-}
+  }
+  
