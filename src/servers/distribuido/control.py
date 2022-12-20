@@ -1,8 +1,6 @@
 import RPi.GPIO as GPIO
 import adafruit_dht
 import time
-import os
-import json
 import board
 import threading
 
@@ -84,7 +82,6 @@ def states(config):
     countPeopleThread = threading.Thread(target=countPeople, args=(config,msg))
     countPeopleThread.start()
 
-
     while(1):
       time.sleep(0.05)
       if GPIO.input(config['L_01']):
@@ -131,9 +128,6 @@ def states(config):
         msg['SPor'] = 'ON'
       else:
         msg['SPor'] = 'OFF'
-
-      # Armazenando dados em um json de estados
-      with open('states/states.json', 'w') as outfile:
-        json.dump(msg,outfile)
-  except KeyboardInterrupt: # if ctrl + c is pressed, exit cleanly
+    
+  except KeyboardInterrupt:
     pass

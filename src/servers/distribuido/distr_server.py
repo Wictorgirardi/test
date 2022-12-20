@@ -1,11 +1,8 @@
-import time
-import os
 import json
 import threading
 import tcpDistr
 import control
 import RPi.GPIO as GPIO
-import socket
 
 def receive(server, config):
   try:
@@ -59,7 +56,6 @@ if __name__ == '__main__':
     server, config = tcpDistr.init()
     controlThread = threading.Thread(target=control.states, args=(config,)) # thread pra atualizar controle de estados
     controlThread.start()  # inicia a thread
-    os.system('clear')
     print('Conversando com servidor central...')
     receive(server, config) # Inicia dialogo com central
 

@@ -1,10 +1,6 @@
 import socket
 import json
 
-"""
-Config do socket
-"""
-
 def readConfig(filename):
   with open(filename,'r') as configfile:
     obj = json.load(configfile)
