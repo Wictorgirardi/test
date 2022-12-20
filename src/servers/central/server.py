@@ -15,6 +15,8 @@ def init():
   with conn:
         print(f"Conectado com o: {addr}")
         while True:
+            menuThread = threading.Thread(target=menu, ) 
+            menuThread.start() 
             addresses.append(addr[0])
             listconn[addr[0]] = conn
             data = conn.recv(1024)
@@ -140,5 +142,3 @@ def menu():
 
 if __name__ == '__main__':
   init() 
-  menuThread = threading.Thread(target=menu, ) 
-  menuThread.start() 
