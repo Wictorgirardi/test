@@ -5,7 +5,6 @@ import control
 import RPi.GPIO as GPIO
 
 def receive(server, config):
-  try:
     while True:
       message = server.recv(2048).decode('ascii')
       print (message)
@@ -47,17 +46,13 @@ def receive(server, config):
         except:
           server.send('NOT_OK'.encode('ascii'))
 
-  except RuntimeError as error:
-        return error.args[0]
-
 if __name__ == '__main__':
   try:
-    print('Conectando com o servidor central. Aguarde...')
     server, config = tcpDistr.init()
-    controlThread = threading.Thread(target=control.states, args=(config,)) # thread pra atualizar controle de estados
-    controlThread.start()  # inicia a thread
-    print('Conversando com servidor central...')
-    receive(server, config) # Inicia dialogo com central
+    controlThread = threading.Thread(target=control.states, args=(config,))
+    controlThread.start()
+    print('Servidor inicializado, recebendo....')
+    receive(server, config) 
 
-  except KeyboardInterrupt: # if ctrl + c is pressed, exit cleanly
+  except KeyboardInterrupt: 
     exit()

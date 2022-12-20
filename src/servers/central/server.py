@@ -5,25 +5,6 @@ import socket
 listconn = {}
 addresses = []
 
-def init():
-  configfile = open('../../configs/configuracao_sala_02.json')
-  file = json.load(configfile)
-  with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
-        server.bind((file['ip_servidor_central'], file['porta_servidor_central']))
-        server.listen(4)  
-        conn, addr = server.accept()
-  with conn:
-        print(f"Conectado com o: {addr}")
-        while True:
-            menuThread = threading.Thread(target=menu, ) 
-            menuThread.start() 
-            addresses.append(addr[0])
-            listconn[addr[0]] = conn
-            data = conn.recv(1024)
-            if not data:
-                break
-            conn.sendall(data)
-
 def sendCommand(conn, COMMAND):
   conn.send(COMMAND.encode('ascii'))
 
@@ -45,7 +26,6 @@ def show_output(conn):
     print('Error getting output')
 
 def get_status(conn):
-  try:
     status = conn.recv(2048).decode('ascii')
     status = json.loads(status)
 
@@ -63,9 +43,6 @@ def get_status(conn):
     print('SJan: '+status['SJan']+' SPor: '+status['SPor'])
     print("Temp={0:0.1f}*C  Humidity={1:0.1f}%".format(status['Temperatura'], status['Humidade']))
     print('Total de pessoas nesta sala: '+status['Pessoas'])
-  except RuntimeError as error:
-    print('Error getting status')
-    return error.args[0]
 
 def get_sucess(conn):
   try:
@@ -80,20 +57,15 @@ def get_sucess(conn):
 def menu():
     op = 0
     while op != 3:
-      print('-----MENU------')
-      print('1) Listar estados dos dispositivos das salas') 
-      print('2) Ative um dispositivo')
-      print('3) Sair do programa')
+      print('Bem vindo ao trabalho 1 de Fundamentos de Sistemas Embarcados do aluno Wictor Girardi')
+      print('1 - Listar todos dispositivos') 
+      print('2 - Ativar ou desativar dispositivos disponiveis')
+      print('3 - Terminar Execução')
       op = input('Digite uma opcao: ')
       if int(op)<1 or int(op)> 3:
+        print('Opção invalida, tente novamente:') 
         menu()
-      
       if int(op) == 1:
-        if len(addresses) == 0:
-          print('Nenhuma sala conectada')
-          input('Aperte enter para continuar...')
-          continue
-
         room = -1
         while room > len(addresses) or room < 0:
           print('------- Listar Estados -------')
@@ -107,10 +79,6 @@ def menu():
         input('Aperte enter para continuar...')
 
       if int(op) == 2:
-        if len(addresses) == 0:
-          print('Nenhuma sala conectada')
-          input('Aperte enter para continuar...')
-          continue
         room = -1
         while room > len(addresses) or room < 0:
           print('----- Listar Estados -------')
@@ -144,7 +112,27 @@ def menu():
           print('Redirecionando para o menu. Aguarde...')
         
       if int(op) == 3:
+        print('Obrigado por utilizar o projeto!')
         quit()
+      
+      else:
+        print('Opção invalida, tente novamente!')
 
 if __name__ == '__main__':
-  init() 
+  configfile = open('../../configs/configuracao_sala_02.json')
+  file = json.load(configfile)
+  with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+        server.bind((file['ip_servidor_central'], file['porta_servidor_central']))
+        server.listen()  
+        conn, addr = server.accept()
+  with conn:
+        print(f"Conectado com o: {addr}")
+        while True:
+            menuThread = threading.Thread(target=menu, ) 
+            menuThread.start() 
+            addresses.append(addr[0])
+            listconn[addr[0]] = conn
+            data = conn.recv(1024)
+            if not data:
+                break
+            conn.sendall(data)
