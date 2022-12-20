@@ -32,6 +32,9 @@ def show_output(conn):
     status = conn.recv(2048).decode('ascii')
     status = json.loads(status)
 
+    if status['SPres'] == 'ON' or status['SFum'] == 'ON' or status['SJan'] == 'ON' or status['SPor'] == 'ON' :
+      status['AL_BZ'] = 'ON'
+
     print('Saidas:')
     print('1) L_01: '+status['L_01'])
     print('2) L_02: '+status['L_02'])
@@ -45,6 +48,9 @@ def get_status(conn):
   try:
     status = conn.recv(2048).decode('ascii')
     status = json.loads(status)
+
+    if status['SPres'] == 'ON' or status['SFum'] == 'ON' or status['SJan'] == 'ON' or status['SPor'] == 'ON' :
+      status['AL_BZ'] = 'ON'
 
     print('Saidas:')
     print('L_01: '+status['L_01']+' L_02: '+status['L_02'])
