@@ -10,7 +10,7 @@ def receive(server, config):
       message = server.recv(2048).decode('ascii')
       print (message)
       if message.startswith('GET_STATUS'):
-        with open('states/states.json', 'r') as openfile:
+        with open('../../configs/responses.json', 'r') as openfile:
           json_object = json.load(openfile)
           msg_to_send = json.dumps(json_object).encode('ascii')
           server.send(msg_to_send)

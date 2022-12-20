@@ -29,7 +29,7 @@ def readConfig(filename):
     return config
 
 def init():
-  config = readConfig('configuracao_sala_02.json')
+  config = readConfig('../../configs/configuracao_sala_02.json')
   server_address = (config['ip_servidor_central'], config['porta_servidor_central'])
   server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   server.connect(server_address)
