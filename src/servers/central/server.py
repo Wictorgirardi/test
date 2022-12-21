@@ -5,6 +5,7 @@ from time import gmtime, strftime
 
 connection = {}
 addresses = []
+server = 0
 
 def log_csv(msg, time):
   with open('log.csv', 'a') as file:
@@ -95,7 +96,11 @@ def menu():
         quit()
     
 if __name__ == '__main__':
-  configfile = open('../../configs/configuracao_sala_02.json')
+  print('Escolha a configuração de sala desejada: ')
+  print('1 - Sala 1')
+  print('2 - Sala 2')
+  server = int(input())
+  configfile = open('../../configs/configuracao_sala_01.json') if server == 1 else open('../../configs/configuracao_sala_02.json')
   file = json.load(configfile)
   with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
         server.bind((file['ip_servidor_central'], file['porta_servidor_central']))
