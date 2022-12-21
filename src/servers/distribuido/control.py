@@ -1,28 +1,9 @@
 import RPi.GPIO as GPIO
 import adafruit_dht
-import time
 import json
 import board
 import threading
-
-temp = 0
-hum = 0
-
-def setupPins(config):
-
-  GPIO.setmode(GPIO.BCM)
-
-  GPIO.setup(config['L_01'], GPIO.OUT)
-  GPIO.setup(config['L_02'], GPIO.OUT)
-  GPIO.setup(config['PR'], GPIO.OUT)
-  GPIO.setup(config['AC'], GPIO.OUT)
-  GPIO.setup(config['AL_BZ'], GPIO.OUT)
-  GPIO.setup(config['SPres'], GPIO.IN)
-  GPIO.setup(config['SFum'], GPIO.IN)
-  GPIO.setup(config['SJan'], GPIO.IN)
-  GPIO.setup(config['SPor'], GPIO.IN)
-  GPIO.setup(config['SC_IN'], GPIO.IN)
-  GPIO.setup(config['SC_OUT'], GPIO.IN)
+import time
 
 def countPeople(config,msg):
   try:
@@ -39,24 +20,18 @@ def countPeople(config,msg):
   except:
     print('Error counting people')
 
-def getHumidity(config,msg):
+
+def temperatura(config,msg):
   try:
-    while True:
-      time.sleep(0.002)
       if config['DHT22'] == 4:
         dht_device = adafruit_dht.DHT22(board.D4, False)
       elif config['DHT22'] == 18:
         dht_device = adafruit_dht.DHT22(board.D18, False)
-      
-      temperature = dht_device.temperature
-      humidity = dht_device.humidity
-      if humidity is not None and temperature is not None:
-        msg['Temperatura'] = temperature
-        msg['Humidade'] = humidity
-      else:
-        print("Failed to retrieve data from humidity sensor")
+      if dht_device.temperature is not None and dht_device.humidity is not None:
+        msg['Temperatura'] = round(dht_device.temperature, 2)
+        msg['Humidade'] = round(dht_device.humidity, 2)
   except:
-    getHumidity(config,msg)
+    temperatura(config,msg)
 
 def states(config):
   try:
@@ -74,17 +49,27 @@ def states(config):
       'Humidade': '0',
       'Pessoas': 0
     }
-    setupPins(config)
-
+    
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(config['L_01'], GPIO.OUT)
+    GPIO.setup(config['L_02'], GPIO.OUT)
+    GPIO.setup(config['PR'], GPIO.OUT)
+    GPIO.setup(config['AC'], GPIO.OUT)
+    GPIO.setup(config['AL_BZ'], GPIO.OUT)
+    GPIO.setup(config['SPres'], GPIO.IN)
+    GPIO.setup(config['SFum'], GPIO.IN)
+    GPIO.setup(config['SJan'], GPIO.IN)
+    GPIO.setup(config['SPor'], GPIO.IN)
+    GPIO.setup(config['SC_IN'], GPIO.IN)
+    GPIO.setup(config['SC_OUT'], GPIO.IN)
     GPIO.add_event_detect(config['SC_IN'], GPIO.RISING)
     GPIO.add_event_detect(config['SC_OUT'], GPIO.RISING)
-    dhtThread = threading.Thread(target=getHumidity, args=(config,msg))
+    dhtThread = threading.Thread(target=temperatura, args=(config,msg))
     dhtThread.start()
-    countPeopleThread = threading.Thread(target=countPeople, args=(config,msg))
-    countPeopleThread.start()
+    contagemThread = threading.Thread(target=countPeople, args=(config,msg))
+    contagemThread.start()
 
     while(1):
-      time.sleep(0.05)
       if GPIO.input(config['L_01']):
         msg['L_01'] = 'ON'
       else:
@@ -134,3 +119,4 @@ def states(config):
         json.dump(msg,outfile)
   except KeyboardInterrupt: 
     pass
+
