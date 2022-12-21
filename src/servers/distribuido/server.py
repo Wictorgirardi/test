@@ -1,6 +1,6 @@
 import json
 import threading
-import control
+import controller
 import RPi.GPIO as GPIO
 import socket
 
@@ -80,7 +80,7 @@ if __name__ == '__main__':
     config = readConfig()
     server = openSocket(config)
 
-    controlThread = threading.Thread(target=control.states, args=(config,))
+    controlThread = threading.Thread(target=controller.states, args=(config,))
     controlThread.start()
     print('Servidor inicializado, recebendo....')
     receive(server, config) 

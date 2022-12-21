@@ -5,9 +5,6 @@ import json
 import board
 import threading
 
-temp = 0
-hum = 0
-
 def setupPins(config):
 
   GPIO.setmode(GPIO.BCM)
@@ -24,39 +21,28 @@ def setupPins(config):
   GPIO.setup(config['SC_IN'], GPIO.IN)
   GPIO.setup(config['SC_OUT'], GPIO.IN)
 
-def countPeople(config,msg):
+def contagem(config,msg):
   try:
-    countP = 0
-    while True:
-      msg['Pessoas'] = str(countP)
-      time.sleep(0.0001)
-      if GPIO.event_detected(config['SC_IN']):
-          countP = countP + 1
-      if GPIO.event_detected(config['SC_OUT']):
-          countP = countP - 1
-          if countP < 0:
-            countP = 0
+    i = 0
+    msg['Pessoas'] = str(i)
+    if GPIO.event_detected(config['SC_IN']):
+          i += 1
+    if GPIO.event_detected(config['SC_OUT']):
+          i -= 1
   except:
-    print('Error counting people')
+    print('Erro durante a contagem')
 
-def getHumidity(config,msg):
+def tempHumi(config,msg):
   try:
-    while True:
-      time.sleep(0.002)
       if config['DHT22'] == 4:
         dht_device = adafruit_dht.DHT22(board.D4, False)
       elif config['DHT22'] == 18:
         dht_device = adafruit_dht.DHT22(board.D18, False)
-      
-      temperature = dht_device.temperature
-      humidity = dht_device.humidity
-      if humidity is not None and temperature is not None:
-        msg['Temperatura'] = temperature
-        msg['Humidade'] = humidity
-      else:
-        print("Failed to retrieve data from humidity sensor")
+      if dht_device.temperature is not None and dht_device.humidity is not None:
+        msg['Temperatura'] = round(dht_device.temperature, 2)
+        msg['Humidade'] = round(dht_device.humidity, 2)
   except:
-    getHumidity(config,msg)
+    tempHumi(config,msg)
 
 def states(config):
   try:
@@ -78,10 +64,10 @@ def states(config):
 
     GPIO.add_event_detect(config['SC_IN'], GPIO.RISING)
     GPIO.add_event_detect(config['SC_OUT'], GPIO.RISING)
-    dhtThread = threading.Thread(target=getHumidity, args=(config,msg))
+    dhtThread = threading.Thread(target=tempHumi, args=(config,msg))
     dhtThread.start()
-    countPeopleThread = threading.Thread(target=countPeople, args=(config,msg))
-    countPeopleThread.start()
+    contagemThread = threading.Thread(target=contagem, args=(config,msg))
+    contagemThread.start()
 
     while(1):
       time.sleep(0.05)
