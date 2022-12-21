@@ -36,7 +36,7 @@ def openSocket():
   configfile = open('../../configs/configuracao_sala_02.json')
   file = json.load(configfile)
   with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
-        server.connect((file['ip_servidor_central'], file['porta_servidor_central']))
+       server.connect((file['ip_servidor_central'], file['porta_servidor_central']))
   return server
   
 
