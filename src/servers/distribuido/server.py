@@ -1,9 +1,8 @@
 import json
 import threading
-import control
+import controllers
 import RPi.GPIO as GPIO
 import socket
-import json
 
 def readConfig():
     configfile = open('../../configs/configuracao_sala_02.json')
@@ -32,25 +31,21 @@ def readConfig():
 
     return config
 
-def openSocket():
-  configfile = open('../../configs/configuracao_sala_02.json')
-  file = json.load(configfile)
-  with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
-       server.connect((file['ip_servidor_central'], file['porta_servidor_central']))
+def openSocket(config):
+  server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+  server.connect((config['ip_servidor_central'], config['porta_servidor_central']))
   return server
   
-
 def receive(server, config):
     while True:
       message = server.recv(2048).decode('ascii')
-      print (message)
-      if message.startswith('GET_STATUS'):
-        with open('../../configs/responses.json', 'r') as openfile:
-          json_object = json.load(openfile)
-          msg_to_send = json.dumps(json_object).encode('ascii')
-          server.send(msg_to_send)
+      if 'GET_STATUS' in message:
+        responseFile = open('../../configs/responses.json')
+        file = json.load(responseFile)
+        msg_to_send = json.dumps(file).encode('ascii')
+        server.send(msg_to_send)
 
-      if message.startswith('ON_OFF_'):
+      if 'ON_OFF_' in message:
         device = message[7:]
         if GPIO.input(config[device]):
           GPIO.output(config[device], GPIO.LOW)
@@ -61,18 +56,17 @@ def receive(server, config):
           server.send('OK'.encode('ascii'))
           continue
 
-      if message.startswith('ON_ALL'):
+      if 'ON_ALL' in message:
         try:
           keys = [*config]
           for device in keys[5:10]:
-            print(config[device])
             GPIO.output(config[device], GPIO.HIGH)
           server.send('OK'.encode('ascii'))
           continue
         except: 
           server.send('NOT_OK'.encode('ascii'))
 
-      if message.startswith('OFF_ALL'):
+      if 'OFF_ALL' in message:
         try:
           keys = [*config]
           for device in keys[5:10]:
@@ -83,13 +77,11 @@ def receive(server, config):
           server.send('NOT_OK'.encode('ascii'))
 
 if __name__ == '__main__':
-  try:
-    server = openSocket()
     config = readConfig()
-    controlThread = threading.Thread(target=control.states, args=(config,))
+    server = openSocket(config)
+
+    controlThread = threading.Thread(target=controllers.states, args=(config))
     controlThread.start()
     print('Servidor inicializado, recebendo....')
     receive(server, config) 
 
-  except KeyboardInterrupt: 
-    exit()

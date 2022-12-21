@@ -25,7 +25,8 @@ def show_devices(conn, showAll):
       print('Sensor presença: ' +status['SPres'])
       print('Sensor fumaça: ' +status['SFum'])
       print('Sensor janela: ' +status['SJan']+' SPor: '+status['SPor'])
-      print("Temperatura da sala={0:0.1f} Celsius e humidade={1:0.1f}%".format(status['Temperatura'], status['Humidade']))
+      print("Temperatura da sala: " + status['Temperatura'] + 'Celsius')
+      print("Humidade: " + status['Humidade'] + '%')
       print('Total de pessoas: ' +status['Pessoas'])
     else: 
       print('\n')
