@@ -33,6 +33,8 @@ def show_devices(conn, showAll):
       print('3 - Ar condicionado: ' +status['AC'])
       print('4 - Projetor: ' +status['PR'])
       print('5 - Alarme: ' +status['AL_BZ'])
+      print('6 - Ligar todos os dispositivos')
+      print('7 - Desligar todos os dispositivos')
 
 def menu():
     op = 0
@@ -49,29 +51,28 @@ def menu():
       if op == 1:
         connection[addresses[0]].send((f'GET_ALL').encode('ascii'))
         show_devices(connection[addresses[0]], "true")
-        input('Continuar...')
+        print('\n')
       if op == 2:
         device = -1
         while device < 1 or device > 7:
           print('Listagem de dispositivos:')
           connection[addresses[0]].send((f'GET_ALL').encode('ascii'))
           show_devices(connection[addresses[0]], "false")
-          print('OBS: Escolha o digito 6 para acionar todos os dispositivos (ON) e 7 para desativar(OFF)')
-          device = int(input('Digite o numero do dispositivo que deseja alternar entre ON/OFF: '))
+          device = int(input('Escolha qual dispositivo deseja alterar: '))
           if device == 1:
-            connection[addresses[0]].send((f'CONTROL_L_01').encode('ascii'))  
+            connection[addresses[0]].send(f'CONTROL_L_01'.encode('ascii'))  
           elif device == 2:
-            connection[addresses[0]].send((f'CONTROL_L_02').encode('ascii'))          
+            connection[addresses[0]].send(f'CONTROL_L_02'.encode('ascii'))          
           elif device == 3:
-            connection[addresses[0]].send((f'CONTROL_AC').encode('ascii'))
+            connection[addresses[0]].send(f'CONTROL_AC'.encode('ascii'))
           elif device == 4:
-            connection[addresses[0]].send((f'CONTROL_PR').encode('ascii'))        
+            connection[addresses[0]].send(f'CONTROL_PR'.encode('ascii'))        
           elif device == 5:
-            connection[addresses[0]].send((f'CONTROL_AL_BZ').encode('ascii'))
+            connection[addresses[0]].send(f'CONTROL_AL_BZ'.encode('ascii'))
           elif device == 6:
-            connection[addresses[0]].send((f'ON_ALL').encode('ascii'))
+            connection[addresses[0]].send(f'ON_ALL'.encode('ascii'))
           elif device == 7:
-            connection[addresses[0]].send((f'OFF_ALL').encode('ascii'))
+            connection[addresses[0]].send(f'OFF_ALL'.encode('ascii'))
           print('Dispositivo alternado com sucesso!') if connection[addresses[0]].recv(2048).decode('ascii') == 'OK' else print('Ooops! Algo errado aconteceu, tente novamente.')
       if op == 3:
         print('Obrigado por utilizar o projeto!')
