@@ -4,19 +4,16 @@ import json
 import board
 import threading
 
-def countPeople(config,msg):
+def contagem(config,msg):
   try:
-    countP = 0
-    while True:
-      msg['Pessoas'] = str(countP)
-      if GPIO.event_detected(config['SC_IN']):
-          countP = countP + 1
-      if GPIO.event_detected(config['SC_OUT']):
-          countP = countP - 1
-          if countP < 0:
-            countP = 0
+    i = 0
+    msg['Pessoas'] = str(i)
+    if GPIO.event_detected(config['SC_IN']):
+          i += 1
+    if GPIO.event_detected(config['SC_OUT']):
+          countP -= 1
   except:
-    print('Error counting people')
+    print('Erro na contagem geral')
 
 def temperatura(config,msg):
   try:
@@ -63,8 +60,8 @@ def states(config):
     GPIO.add_event_detect(config['SC_OUT'], GPIO.RISING)
     dhtThread = threading.Thread(target=temperatura, args=(config,msg))
     dhtThread.start()
-    countPeopleThread = threading.Thread(target=countPeople, args=(config,msg))
-    countPeopleThread.start()
+    contagemThread = threading.Thread(target=contagem, args=(config,msg))
+    contagemThread.start()
 
     while(1):
       if GPIO.input(config['L_01']):
