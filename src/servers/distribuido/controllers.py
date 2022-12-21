@@ -3,12 +3,14 @@ import adafruit_dht
 import json
 import board
 import threading
+import time
 
 def contagem(config,msg):
   try:
     i = 0
     while True: 
       msg['Pessoas'] = str(i)
+      time.sleep(0.0001)
       if GPIO.event_detected(config['SC_IN']):
             i = i + 1
       if GPIO.event_detected(config['SC_OUT']):
