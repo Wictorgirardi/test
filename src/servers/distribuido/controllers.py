@@ -7,11 +7,12 @@ import threading
 def contagem(config,msg):
   try:
     i = 0
-    msg['Pessoas'] = str(i)
-    if GPIO.event_detected(config['SC_IN']):
-          i += 1
-    if GPIO.event_detected(config['SC_OUT']):
-          i -= 1
+    while True: 
+      msg['Pessoas'] = str(i)
+      if GPIO.event_detected(config['SC_IN']):
+            i = i + 1
+      if GPIO.event_detected(config['SC_OUT']):
+            i = i - 1
   except:
     print('Erro na contagem geral')
 
