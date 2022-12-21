@@ -50,7 +50,7 @@ def menu():
       if op == 1:
         sendCommand(listconn[addresses[0]], f'GET_STATUS')
         show_devices(listconn[addresses[0]], "true")
-        input('Aperte enter para continuar...')
+        input('Continuar...')
       if op == 2:
         device = -1
         while device < 1 or device > 7:

@@ -1,10 +1,20 @@
 import json
 import threading
-import tcpDistr
 import control
 import RPi.GPIO as GPIO
+import socket
+import json
 
-def receive(server, config):
+def openSocket():
+  configfile = open('../../configs/configuracao_sala_02.json')
+  file = json.load(configfile)
+  with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
+        server.connect((file['ip_servidor_central'], file['porta_servidor_central']))
+  return server
+  
+def receive(server):
+    configfile = open('../../configs/configuracao_sala_02.json')
+    file = json.load(configfile)
     while True:
       message = server.recv(2048).decode('ascii')
       print (message)
@@ -16,21 +26,21 @@ def receive(server, config):
 
       if message.startswith('ON_OFF_'):
         device = message[7:]
-        if GPIO.input(config[device]):
-          GPIO.output(config[device], GPIO.LOW)
+        if GPIO.input(file[device]):
+          GPIO.output(file[device], GPIO.LOW)
           server.send('OK'.encode('ascii'))
           continue
         else: 
-          GPIO.output(config[device], GPIO.HIGH)
+          GPIO.output(file[device], GPIO.HIGH)
           server.send('OK'.encode('ascii'))
           continue
 
       if message.startswith('ON_ALL'):
         try:
-          keys = [*config]
+          keys = [*file]
           for device in keys[5:10]:
-            print(config[device])
-            GPIO.output(config[device], GPIO.HIGH)
+            print(file[device])
+            GPIO.output(file[device], GPIO.HIGH)
           server.send('OK'.encode('ascii'))
           continue
         except: 
@@ -38,9 +48,9 @@ def receive(server, config):
 
       if message.startswith('OFF_ALL'):
         try:
-          keys = [*config]
+          keys = [*file]
           for device in keys[5:10]:
-            GPIO.output(config[device], GPIO.LOW)
+            GPIO.output(file[device], GPIO.LOW)
           server.send('OK'.encode('ascii'))
           continue
         except:
@@ -48,11 +58,11 @@ def receive(server, config):
 
 if __name__ == '__main__':
   try:
-    server, config = tcpDistr.init()
-    controlThread = threading.Thread(target=control.states, args=(config,))
+    server = openSocket()
+    controlThread = threading.Thread(target=control.states)
     controlThread.start()
     print('Servidor inicializado, recebendo....')
-    receive(server, config) 
+    receive(server) 
 
   except KeyboardInterrupt: 
     exit()
