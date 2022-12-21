@@ -39,6 +39,7 @@ def openSocket(config):
 def receive(server, config):
     while True:
       message = server.recv(2048).decode('ascii')
+      print (message)
       if 'GET_STATUS' in message:
         responseFile = open('../../configs/responses.json')
         file = json.load(responseFile)
