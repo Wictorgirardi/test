@@ -6,21 +6,17 @@ import board
 import msg_mock
 import threading
 
-def setupPins(config):
+def tempHumi(config,msg):
+  try:
+      if config['DHT22'] == 4:
+        dht_device = adafruit_dht.DHT22(board.D4, False)
+      elif config['DHT22'] == 18:
+        dht_device = adafruit_dht.DHT22(board.D18, False)
 
-  GPIO.setmode(GPIO.BCM)
-
-  GPIO.setup(config['L_01'], GPIO.OUT)
-  GPIO.setup(config['L_02'], GPIO.OUT)
-  GPIO.setup(config['PR'], GPIO.OUT)
-  GPIO.setup(config['AC'], GPIO.OUT)
-  GPIO.setup(config['AL_BZ'], GPIO.OUT)
-  GPIO.setup(config['SPres'], GPIO.IN)
-  GPIO.setup(config['SFum'], GPIO.IN)
-  GPIO.setup(config['SJan'], GPIO.IN)
-  GPIO.setup(config['SPor'], GPIO.IN)
-  GPIO.setup(config['SC_IN'], GPIO.IN)
-  GPIO.setup(config['SC_OUT'], GPIO.IN)
+      msg['Temperatura'] = round(dht_device.temperature, 2)
+      msg['Humidade'] = round(dht_device.humidity, 2)
+  except:
+    tempHumi(config,msg)
 
 def contagem(config,msg):
   try:
@@ -33,22 +29,21 @@ def contagem(config,msg):
   except:
     print('Erro durante a contagem')
 
-def tempHumi(config,msg):
-  try:
-      if config['DHT22'] == 4:
-        dht_device = adafruit_dht.DHT22(board.D4, False)
-      elif config['DHT22'] == 18:
-        dht_device = adafruit_dht.DHT22(board.D18, False)
-      if dht_device.temperature is not None and dht_device.humidity is not None:
-        msg['Temperatura'] = round(dht_device.temperature, 2)
-        msg['Humidade'] = round(dht_device.humidity, 2)
-  except:
-    tempHumi(config,msg)
-
 def states(config):
-  try:
     msg = msg_mock.mock
-    setupPins(config)
+    GPIO.setmode(GPIO.BCM)
+
+    GPIO.setup(config['L_01'], GPIO.OUT)
+    GPIO.setup(config['L_02'], GPIO.OUT)
+    GPIO.setup(config['PR'], GPIO.OUT)
+    GPIO.setup(config['AC'], GPIO.OUT)
+    GPIO.setup(config['AL_BZ'], GPIO.OUT)
+    GPIO.setup(config['SPres'], GPIO.IN)
+    GPIO.setup(config['SFum'], GPIO.IN)
+    GPIO.setup(config['SJan'], GPIO.IN)
+    GPIO.setup(config['SPor'], GPIO.IN)
+    GPIO.setup(config['SC_IN'], GPIO.IN)
+    GPIO.setup(config['SC_OUT'], GPIO.IN)
 
     GPIO.add_event_detect(config['SC_IN'], GPIO.RISING)
     GPIO.add_event_detect(config['SC_OUT'], GPIO.RISING)
@@ -58,6 +53,7 @@ def states(config):
     contagemThread.start()
 
     while(1):
+      time.sleep(0.05)
       if GPIO.input(config['L_01']):
         msg['L_01'] = 'ON'
       else:
@@ -105,5 +101,3 @@ def states(config):
     
       with open('../../configs/responses.json', 'w') as outfile:
         json.dump(msg,outfile)
-  except KeyboardInterrupt: 
-    pass

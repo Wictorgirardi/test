@@ -2,11 +2,8 @@ import threading
 import json
 import socket
 
-listconn = {}
+connection = {}
 addresses = []
-
-def sendCommand(conn, COMMAND):
-  conn.send(COMMAND.encode('ascii'))
 
 def show_devices(conn, showAll):
     status = conn.recv(2048).decode('ascii')
@@ -16,7 +13,7 @@ def show_devices(conn, showAll):
       status['AL_BZ'] = 'ON'
 
     if(showAll == 'true'):
-      print('\n')
+      print('--------------------------')
       print('Luz 01: ' +status['L_01'])
       print('Luz 02: ' +status['L_02'])
       print('Ar condicionado: '+status['AC'])
@@ -30,7 +27,7 @@ def show_devices(conn, showAll):
       print("Humidade: " + str(status['Humidade']) + '%')
       print('Total de pessoas: ' +status['Pessoas'])
     else: 
-      print('\n')
+      print('--------------------------')
       print('1 - Luz 01: ' +status['L_01'])
       print('2 - Luz 02: ' +status['L_02'])
       print('3 - Ar condicionado: ' +status['AC'])
@@ -50,32 +47,32 @@ def menu():
         print('Opção invalida, tente novamente:') 
         menu()
       if op == 1:
-        sendCommand(listconn[addresses[0]], f'GET_STATUS')
-        show_devices(listconn[addresses[0]], "true")
+        connection[addresses[0]].send((f'GET_ALL').encode('ascii'))
+        show_devices(connection[addresses[0]], "true")
         input('Continuar...')
       if op == 2:
         device = -1
         while device < 1 or device > 7:
           print('Listagem de dispositivos:')
-          sendCommand(listconn[addresses[0]], f'GET_STATUS')
-          show_devices(listconn[addresses[0]], "false")
+          connection[addresses[0]].send((f'GET_ALL').encode('ascii'))
+          show_devices(connection[addresses[0]], "false")
           print('OBS: Escolha o digito 6 para acionar todos os dispositivos (ON) e 7 para desativar(OFF)')
           device = int(input('Digite o numero do dispositivo que deseja alternar entre ON/OFF: '))
           if device == 1:
-            sendCommand(listconn[addresses[0]], f'ON_OFF_L_01')
+            connection[addresses[0]].send((f'CONTROL_L_01').encode('ascii'))  
           elif device == 2:
-            sendCommand(listconn[addresses[0]], f'ON_OFF_L_02')
+            connection[addresses[0]].send((f'CONTROL_L_02').encode('ascii'))          
           elif device == 3:
-            sendCommand(listconn[addresses[0]], f'ON_OFF_AC')
+            connection[addresses[0]].send((f'CONTROL_AC').encode('ascii'))
           elif device == 4:
-            sendCommand(listconn[addresses[0]], f'ON_OFF_PR')
+            connection[addresses[0]].send((f'CONTROL_PR').encode('ascii'))        
           elif device == 5:
-            sendCommand(listconn[addresses[0]], f'ON_OFF_AL_BZ')
+            connection[addresses[0]].send((f'CONTROL_AL_BZ').encode('ascii'))
           elif device == 6:
-            sendCommand(listconn[addresses[0]], f'ON_ALL')
+            connection[addresses[0]].send((f'ON_ALL').encode('ascii'))
           elif device == 7:
-            sendCommand(listconn[addresses[0]], f'OFF_ALL')
-          print('Dispositivo alternado com sucesso!') if listconn[addresses[0]].recv(2048).decode('ascii') == 'OK' else print('Ooops! Algo errado aconteceu, tente novamente.')
+            connection[addresses[0]].send((f'OFF_ALL').encode('ascii'))
+          print('Dispositivo alternado com sucesso!') if connection[addresses[0]].recv(2048).decode('ascii') == 'OK' else print('Ooops! Algo errado aconteceu, tente novamente.')
       if op == 3:
         print('Obrigado por utilizar o projeto!')
         quit()
@@ -93,7 +90,7 @@ if __name__ == '__main__':
             menuThread = threading.Thread(target=menu, ) 
             menuThread.start() 
             addresses.append(addr[0])
-            listconn[addr[0]] = conn
+            connection[addr[0]] = conn
             data = conn.recv(1024)
             if not data:
                 break

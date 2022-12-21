@@ -1,5 +1,5 @@
 mock = {
-     'L_01': 'OFF',
+      'L_01': 'OFF',
       'L_02': 'OFF',
       'AC': 'OFF',
       'PR': 'OFF',

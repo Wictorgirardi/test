@@ -39,13 +39,13 @@ def openSocket(config):
 def receive(server, config):
     while True:
       message = server.recv(2048).decode('ascii')
-      if 'GET_STATUS' in message:
+      if 'GET_ALL' in message:
         responseFile = open('../../configs/responses.json')
         file = json.load(responseFile)
         msg_to_send = json.dumps(file).encode('ascii')
         server.send(msg_to_send)
 
-      if 'ON_OFF_' in message:
+      if 'CONTROL_' in message:
         device = message[7:]
         if GPIO.input(config[device]):
           GPIO.output(config[device], GPIO.LOW)
