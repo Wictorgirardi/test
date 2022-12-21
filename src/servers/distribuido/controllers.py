@@ -4,6 +4,20 @@ import json
 import board
 import threading
 
+def countPeople(config,msg):
+  try:
+    countP = 0
+    while True:
+      msg['Pessoas'] = str(countP)
+      if GPIO.event_detected(config['SC_IN']):
+          countP = countP + 1
+      if GPIO.event_detected(config['SC_OUT']):
+          countP = countP - 1
+          if countP < 0:
+            countP = 0
+  except:
+    print('Error counting people')
+
 def temperatura(config,msg):
   try:
       if config['DHT22'] == 4:
@@ -15,17 +29,6 @@ def temperatura(config,msg):
       msg['Humidade'] = round(dht_device.humidity, 2)
   except:
     temperatura(config,msg)
-
-def countPeople(config,msg):
-  try:
-    i = 0
-    msg['Pessoas'] = str(i)
-    if GPIO.event_detected(config['SC_IN']):
-          i += 1
-    if GPIO.event_detected(config['SC_OUT']):
-          i -= 1
-  except:
-    print('Algo deu errado na contagem')
 
 def states(config):
   try:
