@@ -3,6 +3,7 @@ import adafruit_dht
 import time
 import json
 import board
+import msg_mock
 import threading
 
 def setupPins(config):
@@ -46,20 +47,7 @@ def tempHumi(config,msg):
 
 def states(config):
   try:
-    msg = {
-      'L_01': 'OFF',
-      'L_02': 'OFF',
-      'AC': 'OFF',
-      'PR': 'OFF',
-      'AL_BZ': 'OFF',
-      'SPres': 'OFF',
-      'SFum': 'OFF',
-      'SJan': 'OFF',
-      'SPor': 'OFF',
-      'Temperatura': '0',
-      'Humidade': '0',
-      'Pessoas': 0
-    }
+    msg = msg_mock.mock
     setupPins(config)
 
     GPIO.add_event_detect(config['SC_IN'], GPIO.RISING)
@@ -70,7 +58,6 @@ def states(config):
     contagemThread.start()
 
     while(1):
-      time.sleep(0.05)
       if GPIO.input(config['L_01']):
         msg['L_01'] = 'ON'
       else:
