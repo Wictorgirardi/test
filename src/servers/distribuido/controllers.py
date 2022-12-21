@@ -24,9 +24,9 @@ def temperatura(config,msg):
         dht_device = adafruit_dht.DHT22(board.D4, False)
       elif config['DHT22'] == 18:
         dht_device = adafruit_dht.DHT22(board.D18, False)
-      
-      msg['Temperatura'] = round(dht_device.temperature, 2)
-      msg['Humidade'] = round(dht_device.humidity, 2)
+      if dht_device.temperature is not None and dht_device.humidity is not None:
+        msg['Temperatura'] = round(dht_device.temperature, 2)
+        msg['Humidade'] = round(dht_device.humidity, 2)
   except:
     temperatura(config,msg)
 
