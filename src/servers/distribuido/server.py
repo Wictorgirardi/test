@@ -4,8 +4,10 @@ import controller
 import RPi.GPIO as GPIO
 import socket
 
-def readConfig():
-    configfile = open('../../configs/configuracao_sala_02.json')
+server = 0
+
+def readConfig(sala):
+    configfile = open('../../configs/configuracao_sala_01.json') if sala == 1 else open('../../configs/configuracao_sala_02.json')
     obj = json.load(configfile)
     config = {}
 
@@ -46,7 +48,7 @@ def receive(server, config):
         server.send(msg_to_send)
 
       if 'CONTROL_' in message:
-        device = message[7:]
+        device = message[8:]
         if GPIO.input(config[device]):
           GPIO.output(config[device], GPIO.LOW)
           server.send('OK'.encode('ascii'))
@@ -77,7 +79,11 @@ def receive(server, config):
           server.send('NOT_OK'.encode('ascii'))
 
 if __name__ == '__main__':
-    config = readConfig()
+    print('Escolha a configuração de sala desejada: ')
+    print('1 - Sala 1')
+    print('2 - Sala 2')
+    server = int(input())
+    config = readConfig(server)
     server = openSocket(config)
 
     controlThread = threading.Thread(target=controller.states, args=(config,))
