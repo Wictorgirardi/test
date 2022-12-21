@@ -20,12 +20,12 @@ def tempHumi(config,msg):
 
 def contagem(config,msg):
   try:
-    i = 0
-    msg['Pessoas'] = str(i)
+    users = 0
+    msg['Pessoas'] = str(users)
     if GPIO.event_detected(config['SC_IN']):
-          i += 1
+          users = users + 1
     if GPIO.event_detected(config['SC_OUT']):
-          i -= 1
+          users = users - 1
   except:
     print('Erro durante a contagem')
 

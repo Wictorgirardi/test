@@ -1,9 +1,15 @@
 import threading
 import json
 import socket
+from datetime import datetime
 
 connection = {}
 addresses = []
+
+def log_csv(msg, time):
+  with open('log.csv', 'a') as file:
+      log = msg + ": " + str(time)
+      file.write(log + '\n')
 
 def show_devices(conn, showAll):
     status = conn.recv(2048).decode('ascii')
@@ -50,29 +56,39 @@ def menu():
         menu()
       if op == 1:
         connection[addresses[0]].send((f'GET_ALL').encode('ascii'))
+        log_csv(f'GET_ALL', datetime.datetime.now())
         show_devices(connection[addresses[0]], "true")
         print('\n')
       if op == 2:
         device = -1
         while device < 1 or device > 7:
+          print('\n')
           print('Listagem de dispositivos:')
           connection[addresses[0]].send((f'GET_ALL').encode('ascii'))
           show_devices(connection[addresses[0]], "false")
           device = int(input('Escolha qual dispositivo deseja alterar: '))
           if device == 1:
             connection[addresses[0]].send(f'CONTROL_L_01'.encode('ascii'))  
+            log_csv(f'CONTROL_L_01', datetime.datetime.now())
           elif device == 2:
             connection[addresses[0]].send(f'CONTROL_L_02'.encode('ascii'))          
+            log_csv(f'CONTROL_L_02', datetime.datetime.now())
           elif device == 3:
             connection[addresses[0]].send(f'CONTROL_AC'.encode('ascii'))
+            log_csv(f'CONTROL_AC', datetime.datetime.now())
           elif device == 4:
-            connection[addresses[0]].send(f'CONTROL_PR'.encode('ascii'))        
+            connection[addresses[0]].send(f'CONTROL_PR'.encode('ascii'))  
+            log_csv(f'CONTROL_PR', datetime.datetime.now())      
           elif device == 5:
             connection[addresses[0]].send(f'CONTROL_AL_BZ'.encode('ascii'))
+            log_csv(f'CONTROL_AL_BZ', datetime.datetime.now())      
           elif device == 6:
             connection[addresses[0]].send(f'ON_ALL'.encode('ascii'))
+            log_csv(f'ON_ALL', datetime.datetime.now())      
           elif device == 7:
             connection[addresses[0]].send(f'OFF_ALL'.encode('ascii'))
+            log_csv(f'OFF_ALL', datetime.datetime.now())      
+          print('\n')
           print('Dispositivo alternado com sucesso!') if connection[addresses[0]].recv(2048).decode('ascii') == 'OK' else print('Ooops! Algo errado aconteceu, tente novamente.')
       if op == 3:
         print('Obrigado por utilizar o projeto!')
