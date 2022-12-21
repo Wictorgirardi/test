@@ -19,11 +19,11 @@ def temperatura(config,msg):
 def countPeople(config,msg):
   try:
     i = 0
-    msg['Pessoas'] = str(countP)
+    msg['Pessoas'] = str(i)
     if GPIO.event_detected(config['SC_IN']):
           i += 1
     if GPIO.event_detected(config['SC_OUT']):
-          countP -= 1
+          i -= 1
   except:
     print('Algo deu errado na contagem')
 
