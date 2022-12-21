@@ -11,7 +11,7 @@ def contagem(config,msg):
     if GPIO.event_detected(config['SC_IN']):
           i += 1
     if GPIO.event_detected(config['SC_OUT']):
-          countP -= 1
+          i -= 1
   except:
     print('Erro na contagem geral')
 
