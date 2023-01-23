@@ -62,8 +62,8 @@ void *controlTemp(void *arg) {
     printf("KP: %f KI: %f KD:%f\n", kp, ki, kd);
     pidSetupConstants(kp, ki, kd); // 30.0, 0.2, 400.0 
     do {
-        requestToUart(uart0_filestream, GET_INTERNAL_TEMP);
-        TI = readFromUart(uart0_filestream, GET_INTERNAL_TEMP).float_value;
+        requestToUart(uart0_filestream, 0xC1);
+        TI = readFromUart(uart0_filestream, 0xC1).float_value;
         internalTemp = TI;
         double value = pidControl(TI);
         pwmControl(value);
@@ -80,8 +80,8 @@ void *controlTemp(void *arg) {
         }
 
         if(menuChoice==2){
-            requestToUart(uart0_filestream, GET_REF_TEMP);
-            TR = readFromUart(uart0_filestream, GET_REF_TEMP).float_value;
+            requestToUart(uart0_filestream, 0xC2);
+            TR = readFromUart(uart0_filestream, 0xC2).float_value;
             userTemp = TR;
             pidUpdateReferences(TR);
         } else if(menuChoice==2){
@@ -99,13 +99,13 @@ void *controlTemp(void *arg) {
             turnOnResistor(100);
             turnOffFan();
             value = 100;
-            sendToUart(uart0_filestream, SEND_CTRL_SIGNAL, value);
+            sendToUart(uart0_filestream, 0xD1, value);
         } else if(TR <= TI && TR != -1) {
 	    printf("Referencia menor que interna, resistor desligado, ventoinha ligada\n");
             turnOffResistor();
             turnOnFan(100);
             value = -100;
-            sendToUart(uart0_filestream, SEND_CTRL_SIGNAL, value);
+            sendToUart(uart0_filestream, 0xD1, value);
         }
 	delay(2000);
     } while (funcState == 1);
@@ -125,8 +125,8 @@ void initMenu() {
             kp = 30.0;
             ki = 0.2;
             kd = 400.0;
-            requestToUart(uart0_filestream, GET_USER_CMD);
-            command = readFromUart(uart0_filestream, GET_USER_CMD).int_value;
+            requestToUart(uart0_filestream, 0xC3);
+            command = readFromUart(uart0_filestream, 0xC3).int_value;
             readCommand(command);
             delay(2000);
         };
@@ -138,8 +138,8 @@ void initMenu() {
             printf("\nInforme uma temperatura de referência para o forno: ");
             scanf("%f", &userTemp);
             pidUpdateReferences(userTemp);
-	    requestToUart(uart0_filestream, TEMP_CTRL_MODE);
-            modeState = readFromUart(uart0_filestream, TEMP_CTRL_MODE).int_value;
+	    requestToUart(uart0_filestream, 0xD4);
+            modeState = readFromUart(uart0_filestream, 0xD4).int_value;
 	    printf("Modo: %d\n", modeState);
             readCommand(0XA3);
     }
@@ -149,23 +149,23 @@ void readCommand(int command) {
     switch(command) {
         case 0xA1:
             printf("Ligando o forno\n");
-            sendToUartByte(uart0_filestream, SEND_SYS_STATE, 1);
+            sendToUartByte(uart0_filestream, 0xD3, 1);
             systemState = 1;
             break;
         case 0xA2:
             printf("Desligando o forno\n");
-            sendToUartByte(uart0_filestream, SEND_SYS_STATE, 0);
+            sendToUartByte(uart0_filestream, 0xD3, 0);
             systemState = 0;
             break;
         case 0XA3:
             printf("Iniciando aquecimento\n");
-            sendToUartByte(uart0_filestream, SEND_FUNC_STATE, 1);
+            sendToUartByte(uart0_filestream, 0xD5, 1);
             funcState = 1;
             pthread_create(&ovenThread, NULL, controlTemp, NULL);
             break;
         case 0XA4:
             printf("Cancelando aquecimento\n");
-            sendToUartByte(uart0_filestream, SEND_FUNC_STATE, 0);
+            sendToUartByte(uart0_filestream, 0xD5, 0);
             funcState = 0;
             break;
         case 0XA5:
