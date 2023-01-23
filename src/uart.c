@@ -5,47 +5,46 @@
 #include <termios.h>  //Used for UART
 #include <unistd.h>   //Used for UART
 
-#include "uart.h"
+#include "uart_defs.h"
 #include "crc16.h"
 
 int initUart(){
-    int uart0_filestream = -1;
+    int uart_filestream = -1;
     char uart_path[] = "/dev/serial0";
-    uart0_filestream = open(uart_path, O_RDWR | O_NOCTTY | O_NDELAY);
-    if(uart0_filestream == -1){
-        printf("Erro - Não foi possível iniciar a UART.\n");
+    uart_filestream = open(uart_path, O_RDWR | O_NOCTTY | O_NDELAY);
+    if(uart_filestream == -1){
+        printf("Não foi possível iniciar a Uart.\n");
     }
     else {
-        printf("UART inicializada!\n");
+        printf("UART inicializado.\n");
     }
     struct termios options;
-    tcgetattr(uart0_filestream, &options);
+    tcgetattr(uart_filestream, &options);
     options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
     options.c_iflag = IGNPAR;
     options.c_oflag = 0;
     options.c_lflag = 0;
-    tcflush(uart0_filestream, TCIFLUSH);
-    tcsetattr(uart0_filestream, TCSANOW, &options);
-    return uart0_filestream;
+    tcflush(uart_filestream, TCIFLUSH);
+    tcsetattr(uart_filestream, TCSANOW, &options);
+    return uart_filestream;
 }
 
-void requestToUart(int uart0_filestream, unsigned char code){
-    unsigned char package[7] = {0x01, 0x23, code, 0x03, 0x02, 0x00, 0x00};
+void requestToUart(int uart_filestream, unsigned char code){
+    unsigned char package[7] = {0x01, 0x23, code, 0x01, 0x04, 0x03, 0x08};
     short crc = calcula_CRC(package, 7);
 
     unsigned char message[9];
     memcpy(message, &package, 7);
     memcpy(&message[7], &crc, 2);
-    int check = write(uart0_filestream, &message[0], 9);
+    int check = write(uart_filestream, &message[0], 9);
     if(check < 0){
         printf("Ocorreu um erro na comunicação com o UART\n");
     }
-
     sleep(1);
 }
 
-void sendToUart(int uart0_filestream, unsigned char code, int value){
-    unsigned char package[7] = {0x01, 0x16, code, 0x03, 0x02, 0x00, 0x00};
+void sendToUart(int uart_filestream, unsigned char code, int value){
+    unsigned char package[7] = {0x01, 0x16, code, 0x01, 0x04, 0x03, 0x08};
     unsigned char message[13];
 
     memcpy(message, &package, 7);
@@ -55,7 +54,7 @@ void sendToUart(int uart0_filestream, unsigned char code, int value){
 
     memcpy(&message[11], &crc, 2);
 
-    int check = write(uart0_filestream, &message[0], 13);
+    int check = write(uart_filestream, &message[0], 13);
 
     if(check < 0){
         printf("Ocorreu um erro na comunicação com o UART\n");
@@ -63,19 +62,19 @@ void sendToUart(int uart0_filestream, unsigned char code, int value){
     sleep(1);
 }
 
-Number_type readFromUart(int uart0_filestream, unsigned char code){
+Number_type readFromUart(int uart_filestream, unsigned char code){
     unsigned char buffer[20];
     Number_type number = {-1, -1.0};
 
-    int receivedBytes = read(uart0_filestream, buffer, 20);
-    if(receivedBytes == 0){
-        printf("Nenhum dado disponível.\n");
+    int content = read(uart_filestream, buffer, 20);
+    if(!content){
+        printf("Nenhum dado foi recebido\n");
     }
-    else if(receivedBytes < 0){
-        printf("Erro na leitura.\n");
+    else if(content < 0){
+        printf("Erro ao ler dados\n");
     }
     else {
-        buffer[receivedBytes] = '\0';
+        buffer[content] = '\0';
         if (code == 0xC3){
             memcpy(&number.int_value, &buffer[3], sizeof(int));
         }
@@ -87,8 +86,8 @@ Number_type readFromUart(int uart0_filestream, unsigned char code){
     return number; 
 }
 
-void sendToUartByte(int uart0_filestream, unsigned char code, char value) {
-    unsigned char package[7] = {0x01, 0x16, code, 0x03, 0x02, 0x00, 0x00};
+void sendToUartByte(int uart_filestream, unsigned char code, char value) {
+    unsigned char package[7] = {0x01, 0x16, code, 0x01, 0x04, 0x03, 0x08};
     unsigned char message[10];
 
     memcpy(message, &package, 7);
@@ -98,7 +97,7 @@ void sendToUartByte(int uart0_filestream, unsigned char code, char value) {
 
     memcpy(&message[8], &crc, 2);
 
-    int check = write(uart0_filestream, &message[0], 10);
+    int check = write(uart_filestream, &message[0], 10);
 
     if(check < 0){
         printf("Ocorreu um erro na comunicação com o UART\n");
@@ -106,7 +105,7 @@ void sendToUartByte(int uart0_filestream, unsigned char code, char value) {
     sleep(1);
 }
 
-void closeUart(int uart0_filestream){
-    printf("Finalizando conexão UART!\n");
-    close(uart0_filestream);
+void closeUart(int uart_filestream){
+    printf("Conexão UART finalizada\n");
+    close(uart_filestream);
 }
