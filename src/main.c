@@ -17,7 +17,7 @@
 #include "gpio.h"
 #include "uart.h"
 #include "i2c.h"
-#include "displaylcd.h"
+#include "display.h"
 
 int uart0_filestream;
 float internalTemp = 0;
