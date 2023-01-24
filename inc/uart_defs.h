@@ -10,7 +10,6 @@
 #define SEND_TIME 0xD6
 #define SEND_CTRL_SIGNAL 0xD1
 
-
 typedef struct Number_type {
   int int_value;
   float float_value;

@@ -3,10 +3,10 @@
 
 double outMeasurement, controlSignal;
 double reference = 0.0;
-double Kp = 0.0;  // Ganho Proporcional
-double Ki = 0.0;  // Ganho Integral
-double Kd = 0.0;  // Ganho Derivativo
-int T = 1.0;      // Período de Amostragem (ms)
+double Kp = 0.0;  
+double Ki = 0.0; 
+double Kd = 0.0; 
+int T = 1.0; 
 unsigned long lastTime;
 double totalError, previousError = 0.0;
 int controlSignalMAX = 100.0;

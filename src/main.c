@@ -11,13 +11,11 @@
 #include <termios.h>
 #include <fcntl.h>
 #include <unistd.h>
-
 #include "pid.h"
 #include "bme280.h"
 #include "gpio.h"
 #include "uart.h"
 #include "i2c.h"
-#include "display.h"
 #include "uart_defs.h"
 
 int uart0_filestream;

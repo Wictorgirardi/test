@@ -1,23 +1,22 @@
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <termios.h>
-#include <unistd.h> 
+#include <fcntl.h> // Contains file controls like O_RDWR
+#include <stdio.h> // Contains printf
+#include <stdlib.h> // Contains exit
+#include <string.h> // Contains string functions
+#include <termios.h> // Contains POSIX terminal control definitions
+#include <unistd.h>  // write(), read(), close()
 
-#include "uart_defs.h"
-#include "crc16.h"
+#include "uart_defs.h" // Contains UART definitions
+#include "crc16.h" // Contains CRC16 definitions
 
-const int initUart(){
-    ssize_t uart_filestream = -1;
-    const char uart_path[] = "/dev/serial0";
+int initUart(){
+    int uart_filestream = -1;
+    char uart_path[] = "/dev/serial0";
     uart_filestream = open(uart_path, O_RDWR | O_NOCTTY | O_NDELAY);
     if(uart_filestream == -1){
-        printf("Não foi possível iniciar a Uart.\n");
+        printf("Erro ao abrir o UART\n");
+        exit(1);
     }
-    else {
-        printf("UART inicializado.\n");
-    }
+
     struct termios options;
     tcgetattr(uart_filestream, &options);
     options.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
@@ -37,9 +36,7 @@ void requestToUart(int uart_filestream, unsigned char code){
     memcpy(message, &package, 7);
     memcpy(&message[7], &crc, 2);
     int check = write(uart_filestream, &message[0], 9);
-    if(check < 0){
-        printf("Ocorreu um erro na comunicação com o UART\n");
-    }
+    sleep(1);
 }
 
 void sendToUart(int uart_filestream, unsigned char code, int value){
@@ -52,49 +49,47 @@ void sendToUart(int uart_filestream, unsigned char code, int value){
     short crc = calcula_CRC(message, 11);
 
     memcpy(&message[11], &crc, 2);
+
     int check = write(uart_filestream, &message[0], 13);
-
-if(check < 0){
-    printf("Ocorreu um erro na comunicação com o UART\n");
-}
+    sleep(1);
 }
 
-const Number_type readFromUart(int uart_filestream, unsigned char code){
-unsigned char buffer[10];
-const Number_type number = {-1, -1.0};
-int content = read(uart_filestream, buffer, 10);
-if(!content){
-    printf("Nenhum dado foi recebido\n");
-}
-else if(content < 0){
-    printf("Erro ao ler dados\n");
-}
-else {
-    buffer[content] = '\0';
-    if (code == 0xC3){
-        memcpy(&number.int_value, &buffer[3], sizeof(int));
+Number_type readFromUart(int uart_filestream, unsigned char code){
+    unsigned char buffer[20];
+    Number_type number = {-1, -1.0};
+
+    int content = read(uart_filestream, buffer, 20);
+    if(!content){
+        printf("Nenhum dado foi recebido\n");
     }
-    else{
-        memcpy(&number.float_value, &buffer[3], sizeof(float));
+    else {
+        buffer[content] = '\0';
+        if (code == GET_USER_CMD){
+            memcpy(&number.int_value, &buffer[3], sizeof(int));
+        }
+        else{
+            memcpy(&number.float_value, &buffer[3], sizeof(float));
+        }
+        return number;
     }
-    return number;
-}
-return number; 
+    return number; 
 }
 
 void sendToUartByte(int uart_filestream, unsigned char code, char value) {
-unsigned char package[7] = {0x01, 0x16, code, 0x07, 0x03, 0x02, 0x06};
-unsigned char message[10];
-memcpy(message, &package, 7);
-memcpy(&message[7], &value, 1);
+    unsigned char package[7] = {0x01, 0x16, code, 0x07, 0x03, 0x02, 0x06};
+    unsigned char message[10];
 
-short crc = calcula_CRC(message, 8);
+    memcpy(message, &package, 7);
+    memcpy(&message[7], &value, 1);
 
-memcpy(&message[8], &crc, 2);
+    short crc = calcula_CRC(message, 8);
 
-int check = write(uart_filestream, &message[0], 10);
+    memcpy(&message[8], &crc, 2);
 
-if(check < 0){
-    printf("Ocorreu um erro na comunicação com o UART\n");
-}
+    int check = write(uart_filestream, &message[0], 10);
+
+    if(check < 0){
+        printf("Ocorreu um erro na comunicação com o UART\n");
+    }
+    sleep(1);
 }
