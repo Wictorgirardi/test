@@ -21,6 +21,5 @@ float kp = 0;
 float kd = 0;
 pthread_t ovenThread;
 pthread_t reportThread;
-struct bme280_dev bme;
 
 #endif /* VARIABLES_H_ */
