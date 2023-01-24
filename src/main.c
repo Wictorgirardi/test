@@ -17,43 +17,10 @@
 #include "uart.h"
 #include "i2c.h"
 #include "uart_defs.h"
+#include "csv.c"
+#include "variables.h"
 
-int uart0_filestream;
-float internalTemp = 0;
-float externalTemp = 0;
-float userTemp = 0;
-int valueFan = 0;
-int valueResistor = 0;
-long millisAux = 0;
-long millisCounter = 0;
-// 1 ligado 0 desligado
-int systemState = 0;
-// 1 funcionando 0 parado
-int funcState = 0;
-// 1 curva/terminal 0 dashboard
-int modeState = 0;
-int menuChoice = 0;
-float ki = 0;
-float kp = 0;
-float kd = 0;
-pthread_t ovenThread;
-pthread_t reportThread;
 struct bme280_dev bme;
-
-
-void *writeReport(void *arg) {
-    while(1){
-        time_t rawtime;
-        struct tm *timeinfo;
-        time(&rawtime);
-        timeinfo = localtime(&rawtime);
-        FILE *fp = fopen("report.csv", "a");
-        fprintf(fp, "%s,%.2f,%.2f,%.2f,%d,%d\n", asctime(timeinfo), internalTemp, externalTemp, userTemp, valueFan, valueResistor);
-        fclose(fp);
-        millisAux = millisCounter;
-        sleep(1);
-    }
-}
 
 void *controlTemp(void *arg) {
     
@@ -170,7 +137,6 @@ void readCommand(int command) {
             funcState = 0;
             break;
         case 0XA5:
-            //alterar o tipo entre referencia e curva
             break;
         default:
             break;
@@ -178,11 +144,11 @@ void readCommand(int command) {
 }
 
 void closeComponents() {
-    printf("\n\n\n\nFechando todos os processos e componentes pendentes\n");
     turnOffResistor();
     turnOffFan();
     close(uart0_filestream);
     pthread_cancel(reportThread);
+    pthread_cancel(ovenThread);
     exit(0);
 }
 
