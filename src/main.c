@@ -128,8 +128,10 @@ void initMenu() {
             ki = 0.2;
             kd = 400.0;
             requestToUart(uart0_filestream, GET_USER_CMD);
+       
             command = readFromUart(uart0_filestream, GET_USER_CMD).int_value;
             readCommand(command);
+            printf("Comando recebido: %d\n", command);
             delay(2000);
         };
     } else if (menuChoice == 1){
