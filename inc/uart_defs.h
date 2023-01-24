@@ -1,7 +1,7 @@
 #ifndef UART_DEFS_H
 #define UART_DEFS_H
 
-#define 0xC1 0xC1
+#define GET_INTERNAL_TEMP 0xC1
 #define GET_POTENTIOMETER 0xC2
 #define GET_KEY_VALUE 0xC3
 #define SEND_SIGNAL 0xD1
