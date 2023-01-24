@@ -18,6 +18,7 @@
 #include "uart.h"
 #include "i2c.h"
 #include "display.h"
+#include "uart_defs.h"
 
 int uart0_filestream;
 float internalTemp = 0;
