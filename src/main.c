@@ -111,40 +111,48 @@ void *controlTemp(void *arg) {
     pthread_exit(0);
 }
 
-void initMenu() {
-    printf("\nIniciando menu!\n");
+void handleManualInput() {
+    printf("\nEntre com o valor de kp:\n");
+    scanf("%f", &kp);
+    printf("\nEntre com o valor de ki:\n");
+    scanf("%f", &ki);
+    printf("\nEntre com o valor de kd:\n");
+    scanf("%f", &kd);
+    printf("\nEntre com a temperatura desejada do forno: ");
+    scanf("%f", &userTemp);
+    pidUpdateReferences(userTemp);
+    modeState = 1;
+    funcState = 1;
+    pthread_create(&ovenThread, NULL, controlTemp, NULL);
+}
+
+void handleDashboardInput() {
     int command;
-    printf("\nEscolha o tipo de execucao (debug ou dashboard)\n1 - Debug\n2 - Dashboard\n");
+    kp = 30.0;
+    ki = 0.2;
+    kd = 400.0;
+    while(!stop_dashboard_loop) {
+        requestToUart(uart0_filestream, GET_USER_CMD);
+        command = readFromUart(uart0_filestream, GET_USER_CMD).int_value;
+        readCommand(command);
+        delay(2000);
+    }
+}
+
+void initMenu() {
+    printf("Seja bem vindo ao trabalho 2 de FSE - Wictor Girardi!\n\n\n\n\n");
+    int menuChoice;
+    printf("\nDeseja entrar com dados manuais ou ter o controle pela dashboard? \n1 - Manual\n2 - Dashboard\n");
     while(menuChoice != 1 && menuChoice != 2){
         scanf("%d",&menuChoice);
     }
     if(menuChoice == 2){
-        while(1) {
-            kp = 30.0;
-            ki = 0.2;
-            kd = 400.0;
-            requestToUart(uart0_filestream, GET_USER_CMD);
-       
-            command = readFromUart(uart0_filestream, GET_USER_CMD).int_value;
-            readCommand(command);
-            delay(2000);
-        };
+        handleDashboardInput();
     } else if (menuChoice == 1){
-            printf("\nEscolha os valores dos parametros de controle do pid na respectiva ordem kp, ki e kd\n");
-            scanf("%f", &kp);
-            scanf("%f", &ki);
-            scanf("%f", &kd);
-            printf("\nInforme uma temperatura de referência para o forno: ");
-            scanf("%f", &userTemp);
-            pidUpdateReferences(userTemp);
-	        modeState = 1;
-	        funcState = 1;
-            pthread_create(&ovenThread, NULL, controlTemp, NULL);
-            while(1){
-                delay(2000);
-            }
+        handleManualInput();
     }
 }
+
 
 void readCommand(int command) {
     switch(command) {
@@ -168,8 +176,6 @@ void readCommand(int command) {
             printf("Cancelando aquecimento\n");
             sendToUartByte(uart0_filestream, SEND_FUNC_STATE, 0);
             funcState = 0;
-            break;
-        case 0XA5:
             break;
         default:
             break;
@@ -199,5 +205,12 @@ int main () {
     bme = bme_start();
     signal(SIGINT, closeComponents);
     initMenu();
+     while(1) {
+        // check for user input or other events that should stop the dashboard loop
+        if (shouldStopDashboard()) {
+            stop_dashboard_loop = 1;
+            initMenu();
+        }
+    }
     return 0;
 }
