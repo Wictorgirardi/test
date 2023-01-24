@@ -34,8 +34,8 @@ void requestToUart(int uart_filestream, unsigned char code){
     short crc = calcula_CRC(package, 7);
 
     unsigned char message[9];
-    memcpy_s(message, sizeof(message), &package, 7);
-    memcpy_s(&message[7], sizeof(short), &crc, 2);
+    memcpy(message, sizeof(message), &package, 7);
+    memcpy(&message[7], sizeof(short), &crc, 2);
     int check = write(uart_filestream, &message[0], 9);
     if(check < 0){
         printf("Ocorreu um erro na comunicação com o UART\n");
@@ -46,12 +46,12 @@ void sendToUart(int uart_filestream, unsigned char code, int value){
     unsigned char package[7] = {0x01, 0x16, code, 0x07, 0x03, 0x02, 0x06};
     unsigned char message[13];
 
-    memcpy_s(message, sizeof(message), &package, 7);
-    memcpy_s(&message[7], sizeof(int), &value, 4);
+    memcpy(message, sizeof(message), &package, 7);
+    memcpy(&message[7], sizeof(int), &value, 4);
 
     short crc = calcula_CRC(message, 11);
 
-    memcpy_s(&message[11], sizeof(short), &crc, 2);
+    memcpy(&message[11], sizeof(short), &crc, 2);
     int check = write(uart_filestream, &message[0], 13);
 
 if(check < 0){
@@ -85,12 +85,12 @@ return number;
 void sendToUartByte(int uart_filestream, unsigned char code, char value) {
 unsigned char package[7] = {0x01, 0x16, code, 0x07, 0x03, 0x02, 0x06};
 unsigned char message[10];
-memcpy_s(message, sizeof(message), &package, 7);
-memcpy_s(&message[7], sizeof(char), &value, 1);
+memcpy(message, sizeof(message), &package, 7);
+memcpy(&message[7], sizeof(char), &value, 1);
 
 short crc = calcula_CRC(message, 8);
 
-memcpy_s(&message[8], sizeof(short), &crc, 2);
+memcpy(&message[8], sizeof(short), &crc, 2);
 
 int check = write(uart_filestream, &message[0], 10);
 
