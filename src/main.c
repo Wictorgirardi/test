@@ -60,7 +60,6 @@ void *controlTemp(void *arg) {
     
     float TI, TR, TE;
     printf("KP: %f KI: %f KD:%f\n", kp, ki, kd);
-    printf("Func state %d\n", funcState);
     pidSetupConstants(kp, ki, kd); // 30.0, 0.2, 400.0
     pthread_create(&reportThread, NULL, writeReport, NULL);
     do {
@@ -93,15 +92,12 @@ void *controlTemp(void *arg) {
         TE = stream_sensor_data_normal_mode(&bme);
         externalTemp = TE;
         printf("\nTemperaturas\nInterna: %.2f\nReferencia: %.2f\nExterna(I2C): %.2f\n", TI, TR, TE);
-
         if(TR > TI && TI != -1){
-	    printf("Referencia maior que interna, resistor ligado e ventoinha desligada\n");
             turnOnResistor(100);
             turnOffFan();
             value = 100;
             sendToUart(uart0_filestream, SEND_CTRL_SIGNAL, value);
         } else if(TR <= TI && TR != -1) {
-	    printf("Referencia menor que interna, resistor desligado, ventoinha ligada\n");
             turnOffResistor();
             turnOnFan(100);
             value = -100;
@@ -154,7 +150,6 @@ void initMenu() {
     printf("Seja bem vindo ao trabalho 2 de FSE - Wictor Girardi!\n\n\n\n\n");
     int menuChoice;
     printf("\nDeseja entrar com dados manuais ou ter o controle pela dashboard? \n1 - Manual\n2 - Dashboard\n");
-    printf("\nPara sair a qualquer momento pressione 3!\n");
     while(menuChoice != 1 && menuChoice != 2){
         scanf("%d",&menuChoice);
     }
@@ -169,23 +164,23 @@ void initMenu() {
 void readCommand(int command) {
     switch(command) {
         case 0xA1:
-            printf("Ligando o forno\n");
+            printf("FORNO - ON\n");
             sendToUartByte(uart0_filestream, SEND_SYSTEM_STATE, 1);
             systemState = 1;
             break;
         case 0xA2:
-            printf("Desligando o forno\n");
+            printf("FORNO - OFF\n");
             sendToUartByte(uart0_filestream, SEND_SYSTEM_STATE, 0);
             systemState = 0;
             break;
         case 0XA3:
-            printf("Iniciando aquecimento\n");
+            printf("HEAT - ON\n");
             sendToUartByte(uart0_filestream, SEND_FUNC_STATE, 1);
             funcState = 1;
             pthread_create(&ovenThread, NULL, controlTemp, NULL);
             break;
         case 0XA4:
-            printf("Cancelando aquecimento\n");
+            printf("HEAT - OFF\n");
             sendToUartByte(uart0_filestream, SEND_FUNC_STATE, 0);
             funcState = 0;
             break;
