@@ -64,7 +64,7 @@ Number_type readFromUart(int uart_filestream, unsigned char code){
     }
     else {
         buffer[content] = '\0';
-        if (code == GET_USER_CMD){
+        if (code == 0xC3){
             memcpy(&number.int_value, &buffer[3], sizeof(int));
         }
         else{
