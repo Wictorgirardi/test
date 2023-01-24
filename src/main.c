@@ -112,6 +112,16 @@ void *controlTemp(void *arg) {
     pthread_exit(0);
 }
 
+int shouldStopDashboard() {
+    int userInput;
+    if (scanf("%i", &userInput) == 1) {
+        if (userInput == 3) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 void handleManualInput() {
     printf("\nEntre com o valor de kp:\n");
     scanf("%f", &kp);
@@ -144,6 +154,7 @@ void initMenu() {
     printf("Seja bem vindo ao trabalho 2 de FSE - Wictor Girardi!\n\n\n\n\n");
     int menuChoice;
     printf("\nDeseja entrar com dados manuais ou ter o controle pela dashboard? \n1 - Manual\n2 - Dashboard\n");
+    printf("\nPara sair a qualquer momento pressione 3!\n");
     while(menuChoice != 1 && menuChoice != 2){
         scanf("%d",&menuChoice);
     }
@@ -208,7 +219,7 @@ int main () {
     initMenu();
      while(1) {
         // check for user input or other events that should stop the dashboard loop
-        if (shouldStopDashboard()) {
+        if (shouldStopDashboard() == 1) {
             stop_dashboard_loop = 1;
             initMenu();
         }
