@@ -33,6 +33,7 @@ int funcState = 0;
 // 1 curva/terminal 0 dashboard
 int modeState = 0;
 int menuChoice = 0;
+int stop_dashboard_loop = 0;
 float ki = 0;
 float kp = 0;
 float kd = 0;
