@@ -40,17 +40,19 @@ pthread_t ovenThread;
 pthread_t reportThread;
 struct bme280_dev bme;
 
-void writeReport() {
-    FILE *fp = fopen("data.csv", "a");
+
+void *writeReport(void *arg) {
     while(1){
-        time_t rawtime = time(NULL);
-        struct tm *timeinfo = localtime(&rawtime);
+        time_t rawtime;
+        struct tm *timeinfo;
+        time(&rawtime);
+        timeinfo = localtime(&rawtime);
+        FILE *fp = fopen("data.csv", "a");
         fprintf(fp, "%s,%.2f,%.2f,%.2f,%d,%d\n", asctime(timeinfo), internalTemp, externalTemp, userTemp, valueFan, valueResistor);
-        fflush(fp);
+        fclose(fp);
         millisAux = millisCounter;
         sleep(1);
     }
-    fclose(fp);
 }
 
 void *controlTemp(void *arg) {
@@ -167,6 +169,8 @@ void readCommand(int command) {
             sendToUartByte(uart0_filestream, SEND_FUNC_STATE, 0);
             funcState = 0;
             break;
+        case 0XA5:
+            break;
         default:
             break;
     }
@@ -182,8 +186,9 @@ void closeComponents() {
 }
 
 int main () {
+
     FILE *fp = fopen("data.csv", "w+");
-    fprintf(fp, "TEMP_INT,TEMP_EXT,TEMP_USR,VAL_FAN,VAL_RES,DATE;\n");
+    fprintf(fp, "DATE,TEMP_INT,TEMP_EXT,TEMP_USR,VAL_FAN,VAL_RES;\n");
     fclose(fp);
     if (wiringPiSetup () == -1) { 
         exit (1);
