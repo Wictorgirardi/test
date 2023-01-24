@@ -167,8 +167,6 @@ void readCommand(int command) {
             sendToUartByte(uart0_filestream, SEND_FUNC_STATE, 0);
             funcState = 0;
             break;
-        case 0XA5:
-            break;
         default:
             break;
     }
@@ -184,7 +182,9 @@ void closeComponents() {
 }
 
 int main () {
-
+    FILE *fp = fopen("data.csv", "w+");
+    fprintf(fp, "TEMP_INT,TEMP_EXT,TEMP_USR,VAL_FAN,VAL_RES,DATE;\n");
+    fclose(fp);
     if (wiringPiSetup () == -1) { 
         exit (1);
     }
