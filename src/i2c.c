@@ -63,7 +63,7 @@ struct bme280_dev bme_start() {
   rslt = bme280_init(&dev);
   if (rslt != BME280_OK) {
     fprintf(stderr, "Failed to stream sensor data (code %+d).\n", rslt);
-    exit(1);
+    //exit(1);
   }
   return dev;
 }
