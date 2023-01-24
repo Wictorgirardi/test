@@ -8,6 +8,8 @@
 #define SEND_SYSTEM_STATE 0xD3
 #define SEND_FUNC_STATE 0xD5
 #define SEND_TIME 0xD6
+#define SEND_CTRL_SIGNAL 0xD1
+#define GET_USER_CMD 0xC3
 
 typedef struct Number_type {
   int int_value;
