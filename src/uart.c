@@ -62,6 +62,9 @@ Number_type readFromUart(int uart_filestream, unsigned char code){
     if(!content){
         printf("Nenhum dado foi recebido\n");
     }
+    else if(content < 0){
+        printf("Erro ao ler dados\n");
+    }
     else {
         buffer[content] = '\0';
         if (code == 0xC3){
