@@ -92,8 +92,6 @@ void *controlTemp(void *arg) {
         TE = stream_sensor_data_normal_mode(&bme);
         externalTemp = TE;
         printf("\nTemperaturas\nInterna: %.2f\nReferencia: %.2f\nExterna(I2C): %.2f\n", TI, TR, TE);
-	
-        printTemp(TI, TE, TR);
 
         if(TR > TI && TI != -1){
 	    printf("Referencia maior que interna, resistor ligado e ventoinha desligada\n");
