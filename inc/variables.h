@@ -3,22 +3,22 @@
 #ifndef VARIABLES_H_
 #define VARIABLES_H_
 
-#define int uart0_filestream;
-#define float internalTemp 0;
-#define float externalTemp 0;
-#define float userTemp  0;
-#define int valueFan  0;
-#define int valueResistor 0;
-#define long millisAux  0;
-#define long millisCounter  0;
-#define int systemState  0;
-#define int funcState  0;
-#define int modeState  0;
-#define int menuChoice  0;
-#define float ki  0;
-#define float kp  0;
-#define float kd  0;
-#define pthread_t ovenThread;
-#define pthread_t reportThread;
+#define uart0_filestream;
+#define internalTemp 0;
+#define externalTemp 0;
+#define userTemp  0;
+#define valueFan  0;
+#define valueResistor 0;
+#define millisAux  0;
+long millisCounter  = 0;
+#define systemState  0;
+#define funcState  0;
+#define modeState  0;
+#define menuChoice  0;
+float ki = 0;
+float kp = 0;
+float kd = 0;
+pthread_t ovenThread;
+pthread_t reportThread;
 
 #endif /* VARIABLES_H_ */
