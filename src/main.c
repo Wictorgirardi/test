@@ -62,8 +62,8 @@ void *controlTemp(void *arg) {
     printf("KP: %f KI: %f KD:%f\n", kp, ki, kd);
     pidSetupConstants(kp, ki, kd); // 30.0, 0.2, 400.0 
     do {
-        requestToUart(uart0_filestream, 0xC1);
-        TI = readFromUart(uart0_filestream, 0xC1).float_value;
+         requestToUart(uart0_filestream, GET_INTERNAL_TEMP);
+        TI = readFromUart(uart0_filestream, GET_INTERNAL_TEMP).float_value;
         internalTemp = TI;
         double value = pidControl(TI);
         pwmControl(value);
