@@ -185,7 +185,7 @@ void closeComponents() {
     printf("\n\n\n\nFechando todos os processos e componentes pendentes\n");
     turnOffResistor();
     turnOffFan();
-    closeUart(uart0_filestream);
+    close(uart0_filestream);
     pthread_cancel(reportThread);
     exit(0);
 }
