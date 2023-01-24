@@ -153,12 +153,12 @@ void readCommand(int command) {
     switch(command) {
         case 0xA1:
             printf("Ligando o forno\n");
-            sendToUartByte(uart0_filestream, SEND_SYS_STATE, 1);
+            sendToUartByte(uart0_filestream, SEND_SYSTEM_STATE, 1);
             systemState = 1;
             break;
         case 0xA2:
             printf("Desligando o forno\n");
-            sendToUartByte(uart0_filestream, SEND_SYS_STATE, 0);
+            sendToUartByte(uart0_filestream, SEND_SYSTEM_STATE, 0);
             systemState = 0;
             break;
         case 0XA3:
