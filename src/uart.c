@@ -90,7 +90,7 @@ memcpy(&message[7], &value, 1);
 
 short crc = calcula_CRC(message, 8);
 
-memcpy(&message[8], sizeof(short), &crc, 2);
+memcpy(&message[8], &crc, 2);
 
 int check = write(uart_filestream, &message[0], 10);
 
