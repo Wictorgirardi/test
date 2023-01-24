@@ -1,14 +1,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-float internalTemp = 0;
-float externalTemp = 0;
-float userTemp = 0;
-int valueFan = 0;
-int valueResistor = 0;
-long millisAux = 0;
-long millisCounter = 0;
+#include "variables.h"
 
 void *writeReport(void *arg) {
     while(1){
